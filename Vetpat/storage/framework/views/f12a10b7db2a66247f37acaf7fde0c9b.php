@@ -21,13 +21,15 @@
             </div>
         </form>
 
+        <!-- Mostrar productos -->
         <div class="row">
             <?php $__currentLoopData = $productos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $producto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         <?php if($producto->imagen): ?>
                             <img src="<?php echo e(asset('storage/imagenes_productos/' . $producto->imagen)); ?>" class="card-img-top"
-                                alt="<?php echo e($producto->nombre); ?>">
+                                alt="<?php echo e($producto->nombre); ?>"
+                                style="height: 200px; object-fit: contain; width: 100%; max-height: 200px;">
                         <?php else: ?>
                             <div class="p-5 text-center">Sin imagen</div>
                         <?php endif; ?>
@@ -41,6 +43,12 @@
                     </div>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+
+        <!-- Paginación -->
+        <div class="mt-4">
+            <?php echo e($productos->links()); ?>
+
         </div>
     </div>
 <?php $__env->stopSection(); ?>

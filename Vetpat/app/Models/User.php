@@ -10,19 +10,25 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-    ];
+    protected $fillable = ['name', 'email', 'password'];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class, 'user_id');
+    }
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            // Crear un registro en Cliente cuando se crea un usuario
+            Cliente::create([
+                'user_id' => $user->id,
+                'telefono' => 'No registrado',
+                'direccion' => 'No registrada'
+            ]);
+        });
+    }
+    
 }

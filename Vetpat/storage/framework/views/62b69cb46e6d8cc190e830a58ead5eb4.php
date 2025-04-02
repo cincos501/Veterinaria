@@ -7,28 +7,33 @@
         <form action="<?php echo e(route('admin.servicios.store')); ?>" method="POST" enctype="multipart/form-data">
             <?php echo csrf_field(); ?>
 
-            <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" name="nombre" class="form-control" required>
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" value="<?php echo e(old('nombre')); ?>" required>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Descripción</label>
-                <textarea name="descripcion" class="form-control" required></textarea>
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea name="descripcion" id="descripcion" class="form-control" required><?php echo e(old('descripcion')); ?></textarea>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Precio (Bs)</label>
-                <input type="number" name="precio" class="form-control" step="0.01" required>
+            <div class="form-group">
+                <label for="precio">Precio</label>
+                <input type="number" name="precio" id="precio" class="form-control" value="<?php echo e(old('precio')); ?>"
+                    required>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Imagen</label>
-                <input type="file" name="imagen" class="form-control">
+            <div class="form-group">
+                <label for="imagen">Imagen</label>
+                <input type="file" name="imagen" id="imagen" class="form-control">
             </div>
 
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="<?php echo e(route('admin.servicios.index')); ?>" class="btn btn-secondary">Cancelar</a>
+            <div class="form-group">
+                <label for="requisitos">Requisitos</label>
+                <textarea name="requisitos" id="requisitos" class="form-control"><?php echo e(old('requisitos')); ?></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Guardar Servicio</button>
         </form>
     </div>
 <?php $__env->stopSection(); ?>

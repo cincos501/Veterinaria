@@ -9,9 +9,18 @@ use Illuminate\Support\Facades\Storage;
 
 class ServicioController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $servicios = Servicio::all();
+        // Obtener el término de búsqueda si se ha ingresado
+        $search = $request->input('search');
+
+        // Paginación con búsqueda, si hay un término de búsqueda
+        $servicios = Servicio::when($search, function ($query, $search) {
+            return $query->where('nombre', 'like', "%{$search}%")
+                         ->orWhere('descripcion', 'like', "%{$search}%");
+        })
+        ->paginate(10); // Paginación de 10 servicios por página
+
         return view('admin.servicios.index', compact('servicios'));
     }
 

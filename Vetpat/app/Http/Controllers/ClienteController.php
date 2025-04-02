@@ -9,35 +9,63 @@ use Illuminate\Support\Facades\Auth;
 
 class ClienteController extends Controller
 {
+    /**
+     * Muestra el dashboard del cliente autenticado.
+     */
     public function dashboard()
     {
-        return view('cliente.dashboard');
+        // Buscar el cliente autenticado o crearlo si no existe
+        $cliente = Cliente::firstOrCreate(
+            ['user_id' => Auth::id()],
+            ['telefono' => 'No registrado', 'direccion' => 'No registrada']
+        );
+
+        return view('cliente.dashboard', compact('cliente'));
     }
 
-    public function index()
+    /**
+     * Muestra la vista del perfil del cliente.
+     */
+    public function perfil()
     {
-        $clientes = Cliente::all();
-        return view('cliente.index', compact('clientes'));
+        // Buscar el cliente con el ID del usuario autenticado
+        $cliente = Cliente::where('user_id', Auth::id())->first();
+
+        // Si no se encuentra, redirigir con un mensaje
+        if (!$cliente) {
+            return redirect()->route('cliente.dashboard')->with('error', 'Debes completar tu perfil antes de acceder.');
+        }
+
+        return view('cliente.perfil', compact('cliente'));
     }
 
-    public function create()
-    {
-        return view('cliente.create');
-    }
-
-    public function store(Request $request)
+    /**
+     * Actualiza los datos del perfil del cliente autenticado.
+     */
+    public function actualizarPerfil(Request $request)
     {
         $request->validate([
-            'telefono' => 'required|string',
-            'direccion' => 'required|string',
+            'telefono' => 'required|string|max:15',
+            'direccion' => 'required|string|max:255',
         ]);
 
-        Cliente::create([
-            'user_id' => Auth::id(),
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-        ]);
+        // Buscar al cliente
+        $cliente = Cliente::where('user_id', Auth::id())->first();
 
-        return redirect()->route('cliente.dashboard')->with('success', 'Cliente registrado con éxito.');
+        // Si no se encuentra, crearlo
+        if (!$cliente) {
+            $cliente = Cliente::create([
+                'user_id' => Auth::id(),
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+            ]);
+        } else {
+            $cliente->update([
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+            ]);
+        }
+
+        return redirect()->route('cliente.dashboard')->with('success', 'Perfil actualizado con éxito.');
     }
 }

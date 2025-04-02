@@ -2,7 +2,11 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="container mt-4">
-        <h2 class="text-center">Iniciar Sesión</h2>
+        <div class="text-center">
+            <img src="<?php echo e(asset('images/logo/logo_veterinaria.png')); ?>" alt="Logo de Veterinaria Patitas" width="120">
+        </div>
+
+        <h2 class="text-center mt-3">Iniciar Sesión</h2>
 
         <form method="POST" action="<?php echo e(route('auth.login.submit')); ?>">
             <?php echo csrf_field(); ?>

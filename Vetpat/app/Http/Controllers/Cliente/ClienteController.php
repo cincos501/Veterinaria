@@ -6,38 +6,82 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ClienteController extends Controller
 {
+    /**
+     * Muestra el dashboard del cliente autenticado.
+     */
     public function dashboard()
     {
-        return view('cliente.dashboard');
+        // Buscar el cliente autenticado o crearlo si no existe
+        $cliente = Cliente::firstOrCreate(
+            ['user_id' => Auth::id()],
+            ['telefono' => 'No registrado', 'direccion' => 'No registrada']
+        );
+
+        return view('cliente.dashboard', compact('cliente'));
     }
 
-    public function index()
+    /**
+     * Muestra la vista del perfil del cliente.
+     */
+    public function perfil()
     {
-        $clientes = Cliente::all();
-        return view('cliente.index', compact('clientes'));
+        // Buscar el cliente con el ID del usuario autenticado
+        $cliente = Cliente::where('user_id', Auth::id())->first();
+
+        // Si no se encuentra, redirigir con un mensaje
+        if (!$cliente) {
+            return redirect()->route('cliente.dashboard')->with('error', 'Debes completar tu perfil antes de acceder.');
+        }
+
+        return view('cliente.perfil', compact('cliente'));
     }
 
-    public function create()
+    /**
+     * Actualiza los datos del perfil del cliente autenticado.
+     */
+    public function actualizarPerfil(Request $request)
     {
-        return view('cliente.create');
-    }
-
-    public function store(Request $request)
-    {
+        // Validación
         $request->validate([
-            'telefono' => 'required|string',
-            'direccion' => 'required|string',
+            'nombre' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'required|string|max:15',
+            'direccion' => 'required|string|max:255',
+            'password' => 'nullable|confirmed|min:6', // Contraseña opcional
         ]);
-
-        Cliente::create([
-            'user_id' => Auth::id(),
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-        ]);
-
-        return redirect()->route('cliente.dashboard')->with('success', 'Cliente registrado con éxito.');
+    
+        // Actualizar los datos del usuario
+        $user = Auth::user();
+        $user->name = $request->nombre;
+        $user->email = $request->email;
+    
+        // Si se proporciona una nueva contraseña, actualizarla
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+    
+        $user->save();
+    
+        // Actualizar la información del cliente
+        $cliente = Cliente::where('user_id', Auth::id())->first();
+        if (!$cliente) {
+            $cliente = Cliente::create([
+                'user_id' => Auth::id(),
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+            ]);
+        } else {
+            $cliente->telefono = $request->telefono;
+            $cliente->direccion = $request->direccion;
+            $cliente->save();
+        }
+    
+        return redirect()->route('cliente.dashboard')->with('success', 'Perfil actualizado con éxito.');
     }
+    
 }
+

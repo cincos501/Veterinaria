@@ -14,7 +14,7 @@ class ProductoController extends Controller
 
         $productos = Producto::when($request->categoria, function ($query) use ($request) {
             return $query->where('categoria', $request->categoria);
-        })->get();
+        })->paginate(12);  // Usamos paginate() para dividir los resultados
 
         return view('cliente.productos.index', compact('productos', 'categorias'));
     }

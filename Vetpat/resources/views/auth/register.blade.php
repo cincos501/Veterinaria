@@ -1,7 +1,12 @@
 @extends('layouts.auth')
 
 @section('content')
-    <h2 class="text-center">Registro</h2>
+    <div class="text-center">
+        <img src="{{ asset('images/logo/logo_veterinaria.png') }}" alt="Logo de Veterinaria Patitas" width="120">
+    </div>
+
+    <h2 class="text-center mt-3">Registro</h2>
+
     <form action="{{ route('auth.register.submit') }}" method="POST">
         @csrf
         <div class="mb-3">
@@ -21,6 +26,7 @@
             <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+
         <p class="text-center mt-2">
             ¿Ya tienes una cuenta? <a href="{{ route('auth.login') }}">Iniciar sesión</a>
         </p>

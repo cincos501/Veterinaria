@@ -53,12 +53,17 @@ Route::get('/home', function () {
 | Rutas para Administrador (Protegidas por Auth)
 |---------------------------------------------------------------------------
 */
+
+
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::resource('servicios', AdminServicioController::class);
     Route::resource('citas', AdminCitaController::class);
     Route::resource('productos', AdminProductoController::class);
     Route::resource('asesoramiento', AdminAsesoramientoController::class);
+    
+    // Nueva ruta para asignar rol de admin a un usuario
+    Route::put('/usuario/asignar-rol/{id}', [AdminController::class, 'asignarRol'])->name('usuario.asignarRol');
 });
 
 /*
@@ -68,6 +73,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 */
 Route::middleware(['auth'])->prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
+    Route::get('/perfil', [ClienteController::class, 'perfil'])->name('perfil'); // Solo una definición de esta ruta
+    Route::post('/perfil/actualizar', [ClienteController::class, 'actualizarPerfil'])->name('actualizarPerfil');
     Route::resource('servicios', ClienteServicioController::class);
     Route::resource('citas', ClienteCitaController::class);
     Route::resource('productos', ClienteProductoController::class);

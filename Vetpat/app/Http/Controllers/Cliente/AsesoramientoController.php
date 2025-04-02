@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Asesoramiento; // Asegúrate de que el modelo Asesoramiento existe.
+use App\Models\Asesoramiento; 
 
 class AsesoramientoController extends Controller
 {

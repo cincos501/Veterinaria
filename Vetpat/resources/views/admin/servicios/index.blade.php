@@ -2,53 +2,99 @@
 
 @section('content')
     <div class="container mt-4">
-        <h2 class="mb-4">Gestión de Servicios</h2>
-        <a href="{{ route('admin.servicios.create') }}" class="btn btn-success mb-3">Agregar Servicio</a>
+        <h2 class="mb-4 text-center">Gestión de Servicios</h2>
+        <a href="{{ route('admin.servicios.create') }}" class="btn btn-primary mb-3">Agregar Servicio</a>
 
         @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
 
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Imagen</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Precio</th>
-                    <th>Requisitos</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($servicios as $servicio)
+        <!-- Filtro de búsqueda -->
+        <div class="mb-3">
+            <form action="{{ route('admin.servicios.index') }}" method="GET">
+                <input type="text" class="form-control" name="search" placeholder="Buscar servicio..."
+                    value="{{ request('search') }}">
+            </form>
+        </div>
+
+        <!-- Tabla de Servicios -->
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
                     <tr>
-                        <td>
-                            @if ($servicio->imagen)
-                                <img src="{{ asset('storage/images/' . $servicio->imagen) }}" alt="Imagen del servicio"
-                                    width="100">
-                            @else
-                                No disponible
-                            @endif
-                        </td>
-                        <td>{{ $servicio->nombre }}</td>
-                        <td>{{ $servicio->descripcion }}</td>
-                        <td>Bs {{ $servicio->precio }}</td>
-                        <td>{{ $servicio->requisitos ?? 'No disponible' }}</td>
-                        <td>
-                            <a href="{{ route('admin.servicios.edit', $servicio->id) }}" class="btn btn-warning">Editar</a>
-                            <form action="{{ route('admin.servicios.destroy', $servicio->id) }}" method="POST"
-                                style="display:inline;">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger"
-                                    onclick="return confirm('¿Estás seguro de eliminar este servicio?')">
-                                    Eliminar
-                                </button>
-                            </form>
-                        </td>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Requisitos</th>
+                        <th>Acciones</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($servicios as $servicio)
+                        <tr>
+                            <td>
+                                @if ($servicio->imagen)
+                                    <img src="{{ asset('storage/images/' . $servicio->imagen) }}"
+                                        alt="Imagen del servicio: {{ $servicio->nombre }}" class="img-fluid"
+                                        style="max-width: 100px;">
+                                @else
+                                    No disponible
+                                @endif
+                            </td>
+                            <td>{{ $servicio->nombre }}</td>
+                            <td>{{ Str::limit($servicio->descripcion, 50) }}</td>
+                            <td>Bs {{ number_format($servicio->precio, 2) }}</td>
+                            <td>{{ $servicio->requisitos ?? 'No disponible' }}</td>
+                            <td>
+                                <a href="{{ route('admin.servicios.edit', $servicio->id) }}"
+                                    class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <!-- Modal de Confirmación para Eliminar -->
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ $servicio->id }}"
+                                    class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </a>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="confirmDelete{{ $servicio->id }}" tabindex="-1"
+                                    aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmDeleteLabel">Confirmar eliminación</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Estás seguro de eliminar este servicio?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancelar</button>
+                                                <form action="{{ route('admin.servicios.destroy', $servicio->id) }}"
+                                                    method="POST">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-center mt-3">
+            {{ $servicios->links() }}
+        </div>
     </div>
 @endsection

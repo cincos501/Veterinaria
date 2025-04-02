@@ -20,13 +20,15 @@
             </div>
         </form>
 
+        <!-- Mostrar productos -->
         <div class="row">
             @foreach ($productos as $producto)
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         @if ($producto->imagen)
                             <img src="{{ asset('storage/imagenes_productos/' . $producto->imagen) }}" class="card-img-top"
-                                alt="{{ $producto->nombre }}">
+                                alt="{{ $producto->nombre }}"
+                                style="height: 200px; object-fit: contain; width: 100%; max-height: 200px;">
                         @else
                             <div class="p-5 text-center">Sin imagen</div>
                         @endif
@@ -40,6 +42,11 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+
+        <!-- Paginación -->
+        <div class="mt-4">
+            {{ $productos->links() }}
         </div>
     </div>
 @endsection

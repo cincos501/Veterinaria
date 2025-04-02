@@ -2,7 +2,11 @@
 
 @section('content')
     <div class="container mt-4">
-        <h2 class="text-center">Iniciar Sesión</h2>
+        <div class="text-center">
+            <img src="{{ asset('images/logo/logo_veterinaria.png') }}" alt="Logo de Veterinaria Patitas" width="120">
+        </div>
+
+        <h2 class="text-center mt-3">Iniciar Sesión</h2>
 
         <form method="POST" action="{{ route('auth.login.submit') }}">
             @csrf
