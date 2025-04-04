@@ -21,6 +21,13 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h5 class="card-title">Detalles de mi Perfil</h5>
+
+                        <!-- Imagen de perfil -->
+                        <div class="text-center mb-4">
+                            <img src="{{ asset('images/logo/perfil.jpg') }}" alt="Imagen de Perfil" class="rounded-circle"
+                                style="width: 150px; height: 150px;">
+                        </div>
+
                         <p><strong>Nombre:</strong> {{ Auth::user()->name }}</p>
                         <p><strong>Email:</strong> {{ Auth::user()->email }}</p>
                         <p><strong>Teléfono:</strong> {{ $cliente->telefono }}</p>

@@ -4,7 +4,6 @@
     <div class="container mt-4">
         <h1 class="mb-4 text-center">Lista de Productos</h1>
 
-        <!-- Filtro por categoría -->
         <form method="GET" action="{{ route('admin.productos.index') }}" class="mb-3">
             <div class="row">
                 <div class="col-md-4">
@@ -15,6 +14,14 @@
                                 {{ $categoria }}
                             </option>
                         @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="promocion" class="form-control" onchange="this.form.submit()">
+                        <option value="">Promociones y No promociones</option>
+                        <option value="1" {{ request('promocion') == '1' ? 'selected' : '' }}>Solo en promoción
+                        </option>
+                        <option value="0" {{ request('promocion') == '0' ? 'selected' : '' }}>No en promoción</option>
                     </select>
                 </div>
             </div>
@@ -58,11 +65,15 @@
                             <td>{{ $producto->stock }}</td>
                             <td>{{ $producto->categoria }}</td>
                             <td>
-                                @if ($producto->en_promocion)
-                                    <span class="badge bg-success">Sí</span>
-                                @else
-                                    <span class="badge bg-secondary">No</span>
-                                @endif
+                                <form action="{{ route('admin.productos.togglePromocion', $producto->id) }}" method="POST"
+                                    style="display:inline;">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit"
+                                        class="btn btn-sm {{ $producto->promocion ? 'btn-success' : 'btn-secondary' }}">
+                                        {{ $producto->promocion ? 'Sí' : 'No' }}
+                                    </button>
+                                </form>
                             </td>
                             <td>
                                 <a href="{{ route('admin.productos.edit', $producto->id) }}"

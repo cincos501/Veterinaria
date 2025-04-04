@@ -9,8 +9,8 @@ use App\Models\Asesoramiento;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade as PDF;
 
 class AdminController extends Controller
 {
@@ -25,13 +25,8 @@ class AdminController extends Controller
         // Obtener citas programadas para hoy
         $citasHoy = Cita::whereDate('fecha_hora', Carbon::today())->get();
 
-        // Obtener los servicios más solicitados
-        $serviciosSolicitados = Servicio::select('nombre', DB::raw('count(*) as total_solicitado'))
-            ->join('citas', 'citas.servicio_id', '=', 'servicios.id')
-            ->groupBy('nombre')
-            ->orderByDesc('total_solicitado')
-            ->take(5)
-            ->get();
+        // Obtener los productos con stock bajo (menor o igual a 5)
+        $productosBajoStock = Producto::where('stock', '<=', 5)->get();
 
         // Obtener los usuarios con su rol desde la tabla 'users'
         $usuarios = User::all();
@@ -42,35 +37,44 @@ class AdminController extends Controller
             'productosCount',
             'asesoramientosCount',
             'citasHoy',
-            'serviciosSolicitados',
+            'productosBajoStock',
             'usuarios'
         ));
     }
 
-    public function asignarRol($userId)
+    public function asignarRol(Request $request, User $user)
     {
-        // Encontrar al usuario
-        $user = User::findOrFail($userId);
+        // Evitar que un usuario se asigne a sí mismo como admin
+        if (Auth::id() === $user->id) {
+            return redirect()->route('admin.dashboard')->with('error', 'No puedes cambiar tu propio rol.');
+        }
 
-        // Verificar si ya es administrador
-        if ($user->rol === 'admin') {
+        // Verificar si ya es admin
+        if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard')->with('error', 'Este usuario ya es administrador.');
         }
 
-        // Asignar el rol de administrador
-        $user->update(['rol' => 'admin']);
+        // Asignar rol de admin
+        $user->update(['role' => 'admin']);
 
         return redirect()->route('admin.dashboard')->with('success', 'Rol de admin asignado con éxito.');
     }
 
-    public function generarPDF()
+    public function removerRol(Request $request, User $user)
     {
-        // Obtener todos los productos
-        $productos = Producto::all();
+        // Evitar que un usuario se elimine a sí mismo como admin
+        if (Auth::id() === $user->id) {
+            return redirect()->route('admin.dashboard')->with('error', 'No puedes remover tu propio rol.');
+        }
 
-        // Generar el PDF con la vista 'admin.pdf.productos'
-        $pdf = PDF::loadView('admin.pdf.productos', compact('productos'));
+        // Verificar si el usuario ya no es admin
+        if ($user->role !== 'admin') {
+            return redirect()->route('admin.dashboard')->with('error', 'Este usuario no es administrador.');
+        }
 
-        return $pdf->download('productos.pdf');
+        // Cambiar rol a cliente
+        $user->update(['role' => 'cliente']);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Rol de admin removido con éxito.');
     }
 }

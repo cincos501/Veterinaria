@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
+use App\Models\Compra;
+use App\Models\Cita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class ClienteController extends Controller
 {
@@ -21,7 +22,18 @@ class ClienteController extends Controller
             ['telefono' => 'No registrado', 'direccion' => 'No registrada']
         );
 
-        return view('cliente.dashboard', compact('cliente'));
+        // Obtener las compras del cliente autenticado con el nombre del usuario y la información del cliente
+        $compras = Compra::where('user_id', Auth::id())
+            ->with(['user.cliente']) // Cargar las relaciones
+            ->get();
+
+        // Obtener las citas futuras del cliente
+        $citas = Cita::where('user_id', Auth::id())
+                     ->where('fecha_hora', '>=', now())  // Citas futuras
+                     ->orderBy('fecha_hora', 'asc')  // Ordenadas por fecha
+                     ->get();
+
+        return view('cliente.dashboard', compact('cliente', 'compras', 'citas'));
     }
 
     /**
@@ -82,6 +94,4 @@ class ClienteController extends Controller
     
         return redirect()->route('cliente.dashboard')->with('success', 'Perfil actualizado con éxito.');
     }
-    
 }
-

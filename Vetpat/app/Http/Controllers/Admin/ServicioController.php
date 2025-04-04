@@ -11,15 +11,13 @@ class ServicioController extends Controller
 {
     public function index(Request $request)
     {
-        // Obtener el término de búsqueda si se ha ingresado
         $search = $request->input('search');
 
-        // Paginación con búsqueda, si hay un término de búsqueda
         $servicios = Servicio::when($search, function ($query, $search) {
             return $query->where('nombre', 'like', "%{$search}%")
                          ->orWhere('descripcion', 'like', "%{$search}%");
         })
-        ->paginate(10); // Paginación de 10 servicios por página
+        ->paginate(10);
 
         return view('admin.servicios.index', compact('servicios'));
     }
@@ -36,7 +34,8 @@ class ServicioController extends Controller
             'descripcion' => 'required',
             'precio' => 'required|numeric',
             'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'requisitos' => 'nullable|string'
+            'requisitos' => 'nullable|string',
+            'promocion' => 'nullable|boolean',
         ]);
 
         $imagenPath = null;
@@ -51,6 +50,7 @@ class ServicioController extends Controller
             'precio' => $request->precio,
             'imagen' => $imagenPath,
             'requisitos' => $request->requisitos,
+            'promocion' => $request->promocion ?? false,
         ]);
 
         return redirect()->route('admin.servicios.index')->with('success', 'Servicio agregado correctamente.');
@@ -71,7 +71,8 @@ class ServicioController extends Controller
             'descripcion' => 'required',
             'precio' => 'required|numeric',
             'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'requisitos' => 'nullable|string'
+            'requisitos' => 'nullable|string',
+            'promocion' => 'nullable|boolean',
         ]);
 
         $imagenPath = $servicio->imagen;
@@ -89,6 +90,7 @@ class ServicioController extends Controller
             'precio' => $request->precio,
             'imagen' => $imagenPath,
             'requisitos' => $request->requisitos,
+            'promocion' => $request->promocion ?? $servicio->promocion,
         ]);
 
         return redirect()->route('admin.servicios.index')->with('success', 'Servicio actualizado correctamente.');
@@ -105,5 +107,19 @@ class ServicioController extends Controller
         $servicio->delete();
 
         return redirect()->route('admin.servicios.index')->with('success', 'Servicio eliminado correctamente.');
+    }
+
+    public function togglePromocion($id)
+    {
+        $servicio = Servicio::find($id);
+
+        if ($servicio) {
+            $servicio->promocion = !$servicio->promocion;
+            $servicio->save();
+
+            return redirect()->route('admin.servicios.index')->with('success', 'Estado de promoción actualizado');
+        }
+
+        return redirect()->route('admin.servicios.index')->with('error', 'Servicio no encontrado');
     }
 }

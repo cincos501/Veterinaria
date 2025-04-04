@@ -13,9 +13,11 @@ class ProductoController extends Controller
     {
         $categorias = ['Medicamentos', 'Higiene y Cuidado', 'Alimentos y Suplementos', 'Cuidado y Alojamiento', 'Juguete'];
 
-        // Filtrar por categoría si se selecciona
+        // Filtrar por categoría y promoción si se selecciona
         $productos = Producto::when($request->categoria, function ($query) use ($request) {
             return $query->where('categoria', $request->categoria);
+        })->when($request->promocion !== null, function ($query) use ($request) {
+            return $query->where('promocion', $request->promocion);
         })->get();
 
         return view('admin.productos.index', compact('productos', 'categorias'));
@@ -35,13 +37,14 @@ class ProductoController extends Controller
             'precio' => 'required|numeric',
             'stock' => 'required|integer',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'categoria' => 'required|in:Medicamentos,Higiene y Cuidado,Alimentos y Suplementos,Cuidado y Alojamiento,Juguete'
+            'categoria' => 'required|in:Medicamentos,Higiene y Cuidado,Alimentos y Suplementos,Cuidado y Alojamiento,Juguete',
+            'promocion' => 'nullable|boolean',
         ]);
 
         $imagenPath = null;
         if ($request->hasFile('imagen')) {
             $imagenPath = $request->file('imagen')->store('imagenes_productos', 'public');
-            $imagenPath = basename($imagenPath); // Guardamos solo el nombre de la imagen
+            $imagenPath = basename($imagenPath);
         }
 
         Producto::create([
@@ -51,6 +54,7 @@ class ProductoController extends Controller
             'stock' => $request->stock,
             'imagen' => $imagenPath,
             'categoria' => $request->categoria,
+            'promocion' => $request->has('promocion'),
         ]);
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto agregado correctamente.');
@@ -73,12 +77,12 @@ class ProductoController extends Controller
             'precio' => 'required|numeric',
             'stock' => 'required|integer',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'categoria' => 'required|in:Medicamentos,Higiene y Cuidado,Alimentos y Suplementos,Cuidado y Alojamiento,Juguete'
+            'categoria' => 'required|in:Medicamentos,Higiene y Cuidado,Alimentos y Suplementos,Cuidado y Alojamiento,Juguete',
+            'promocion' => 'nullable|boolean',
         ]);
 
         $imagenPath = $producto->imagen;
         if ($request->hasFile('imagen')) {
-            // Eliminar la imagen anterior si existe
             if ($producto->imagen) {
                 Storage::disk('public')->delete('imagenes_productos/' . $producto->imagen);
             }
@@ -93,6 +97,7 @@ class ProductoController extends Controller
             'stock' => $request->stock,
             'imagen' => $imagenPath,
             'categoria' => $request->categoria,
+            'promocion' => $request->has('promocion'),
         ]);
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto actualizado correctamente.');
@@ -109,5 +114,13 @@ class ProductoController extends Controller
         $producto->delete();
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto eliminado correctamente.');
+    }
+
+    public function togglePromocion($id)
+    {
+        $producto = Producto::findOrFail($id);
+        $producto->update(['promocion' => !$producto->promocion]);
+
+        return redirect()->route('admin.productos.index')->with('success', 'Estado de promoción actualizado.');
     }
 }

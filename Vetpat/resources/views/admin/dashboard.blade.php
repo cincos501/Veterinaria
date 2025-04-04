@@ -69,14 +69,37 @@
             </div>
         </div>
 
-        <!-- Gráfica de Servicios Más Solicitados -->
+        <!-- Productos con Bajo Stock -->
         <div class="col-lg-12 col-md-12 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Servicios Más Solicitados</h5>
-                    <div style="max-height: 300px; width: 100%;">
-                        <canvas id="graficoServicios"></canvas>
-                    </div>
+                    <h5 class="card-title">Productos con Bajo Stock</h5>
+                    @if ($productosBajoStock->isEmpty())
+                        <p>No hay productos con bajo stock.</p>
+                    @else
+                        <p class="alert alert-warning">¡Alerta! Algunos productos están por acabarse.</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Producto</th>
+                                    <th>Stock Actual</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($productosBajoStock as $producto)
+                                    <tr>
+                                        <td>{{ $producto->nombre }}</td>
+                                        <td>{{ $producto->stock }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.productos.edit', $producto->id) }}"
+                                                class="btn btn-warning btn-sm">Editar</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
                 </div>
             </div>
         </div>
@@ -100,14 +123,31 @@
                                 <tr>
                                     <td>{{ $usuario->name }}</td>
                                     <td>{{ $usuario->email }}</td>
-                                    <td>{{ $usuario->rol }}</td>
+                                    <td>{{ $usuario->role }}</td>
                                     <td>
+                                        <!-- Asignar rol de Admin -->
                                         <form action="{{ route('admin.usuario.asignarRol', $usuario->id) }}"
                                             method="POST">
                                             @csrf
-                                            @method('PUT')
                                             <button type="submit" class="btn btn-warning btn-sm">Asignar Rol Admin</button>
                                         </form>
+                                    </td>
+                                    <td>
+                                        @if ($usuario->role === 'admin')
+                                            <!-- Remover Admin -->
+                                            <form action="{{ route('admin.usuario.removerRol', $usuario->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm">Remover Admin</button>
+                                            </form>
+                                        @else
+                                            <!-- Remover otro rol -->
+                                            <form action="{{ route('admin.usuario.removerRol', $usuario->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm">Remover Rol</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -117,37 +157,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Agregar Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var ctx = document.getElementById('graficoServicios').getContext('2d');
-
-            var chartData = {
-                labels: @json($serviciosSolicitados->pluck('nombre')),
-                datasets: [{
-                    label: 'Número de Solicitudes',
-                    data: @json($serviciosSolicitados->pluck('total_solicitado')),
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            };
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true, // Mantiene la relación de aspecto
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-    </script>
 @endsection

@@ -69,14 +69,37 @@
             </div>
         </div>
 
-        <!-- Gráfica de Servicios Más Solicitados -->
+        <!-- Productos con Bajo Stock -->
         <div class="col-lg-12 col-md-12 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Servicios Más Solicitados</h5>
-                    <div style="max-height: 300px; width: 100%;">
-                        <canvas id="graficoServicios"></canvas>
-                    </div>
+                    <h5 class="card-title">Productos con Bajo Stock</h5>
+                    <?php if($productosBajoStock->isEmpty()): ?>
+                        <p>No hay productos con bajo stock.</p>
+                    <?php else: ?>
+                        <p class="alert alert-warning">¡Alerta! Algunos productos están por acabarse.</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Producto</th>
+                                    <th>Stock Actual</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $productosBajoStock; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $producto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td><?php echo e($producto->nombre); ?></td>
+                                        <td><?php echo e($producto->stock); ?></td>
+                                        <td>
+                                            <a href="<?php echo e(route('admin.productos.edit', $producto->id)); ?>"
+                                                class="btn btn-warning btn-sm">Editar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -100,14 +123,31 @@
                                 <tr>
                                     <td><?php echo e($usuario->name); ?></td>
                                     <td><?php echo e($usuario->email); ?></td>
-                                    <td><?php echo e($usuario->rol); ?></td>
+                                    <td><?php echo e($usuario->role); ?></td>
                                     <td>
+                                        <!-- Asignar rol de Admin -->
                                         <form action="<?php echo e(route('admin.usuario.asignarRol', $usuario->id)); ?>"
                                             method="POST">
                                             <?php echo csrf_field(); ?>
-                                            <?php echo method_field('PUT'); ?>
                                             <button type="submit" class="btn btn-warning btn-sm">Asignar Rol Admin</button>
                                         </form>
+                                    </td>
+                                    <td>
+                                        <?php if($usuario->role === 'admin'): ?>
+                                            <!-- Remover Admin -->
+                                            <form action="<?php echo e(route('admin.usuario.removerRol', $usuario->id)); ?>"
+                                                method="POST">
+                                                <?php echo csrf_field(); ?>
+                                                <button type="submit" class="btn btn-danger btn-sm">Remover Admin</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <!-- Remover otro rol -->
+                                            <form action="<?php echo e(route('admin.usuario.removerRol', $usuario->id)); ?>"
+                                                method="POST">
+                                                <?php echo csrf_field(); ?>
+                                                <button type="submit" class="btn btn-danger btn-sm">Remover Rol</button>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -117,39 +157,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Agregar Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var ctx = document.getElementById('graficoServicios').getContext('2d');
-
-            var chartData = {
-                labels: <?php echo json_encode($serviciosSolicitados->pluck('nombre'), 15, 512) ?>,
-                datasets: [{
-                    label: 'Número de Solicitudes',
-                    data: <?php echo json_encode($serviciosSolicitados->pluck('total_solicitado'), 15, 512) ?>,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            };
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true, // Mantiene la relación de aspecto
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-    </script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\veterinaria\Vetpat\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

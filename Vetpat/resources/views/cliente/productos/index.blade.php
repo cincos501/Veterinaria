@@ -36,6 +36,12 @@
                             <h5 class="card-title">{{ $producto->nombre }}</h5>
                             <p class="card-text">{{ Str::limit($producto->descripcion, 100) }}</p>
                             <p><strong>Bs {{ number_format($producto->precio, 2) }}</strong></p>
+
+                            <!-- Mostrar promoción si existe -->
+                            @if ($producto->promocion)
+                                <p class="text-success font-weight-bold mt-2">¡En promoción! -20%</p>
+                            @endif
+
                             <a href="{{ route('cliente.productos.show', $producto->id) }}" class="btn btn-primary">Ver
                                 Detalles</a>
                         </div>

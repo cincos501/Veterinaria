@@ -9,6 +9,6 @@ class Servicio extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'descripcion', 'precio', 'imagen', 'requisitos'];
+    protected $fillable = ['nombre', 'descripcion', 'precio', 'imagen', 'requisitos', 'promocion'];
 
 }

@@ -15,6 +15,12 @@
                             <h5 class="card-title text-uppercase font-weight-bold">{{ $servicio->nombre }}</h5>
                             <p class="card-text text-muted mb-3">{{ Str::limit($servicio->descripcion, 100) }}</p>
                             <p class="card-text font-weight-bold text-dark">Bs {{ number_format($servicio->precio, 2) }}</p>
+
+                            <!-- Mostrar promoción si existe -->
+                            @if ($servicio->promocion)
+                                <p class="text-success font-weight-bold mt-2">¡En promoción! -50%</p>
+                            @endif
+
                             <a href="{{ route('cliente.servicios.show', $servicio->id) }}"
                                 class="btn btn-primary mt-2 w-100 py-2 font-weight-bold transition-all transform hover:bg-primary-500 hover:scale-110">
                                 Ver detalles

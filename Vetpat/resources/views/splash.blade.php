@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,12 +24,14 @@
         }
 
         .logo {
-            display: none; /* Logo oculto inicialmente */
+            display: none;
+            /* Logo oculto inicialmente */
             margin-top: 50px;
         }
 
         .message {
-            display: none; /* Mensaje oculto inicialmente */
+            display: none;
+            /* Mensaje oculto inicialmente */
             font-size: 30px;
             color: #333;
             font-weight: 700;
@@ -38,8 +41,10 @@
         /* Animación de la gota */
         .drop {
             position: absolute;
-            width: 120px; /* Tamaño aumentado */
-            height: 120px; /* Tamaño aumentado */
+            width: 120px;
+            /* Tamaño aumentado */
+            height: 120px;
+            /* Tamaño aumentado */
             background-color: #00aaff;
             border-radius: 50%;
             animation: bounce 2s infinite;
@@ -49,26 +54,32 @@
             0% {
                 transform: translateY(0);
             }
+
             30% {
                 transform: translateY(-50px);
             }
+
             50% {
                 transform: translateY(0);
             }
+
             70% {
                 transform: translateY(-25px);
             }
+
             100% {
                 transform: translateY(0);
             }
         }
     </style>
 </head>
+
 <body>
     <div class="splash-container">
         <div class="drop"></div>
         <div class="message" id="message">Bienvenidos a la VETERINARIA PATITAS</div>
-        <img src="{{ asset('images/logo/logo_veterinaria.png') }}" alt="Logo de Veterinaria Patitas" class="logo" id="logo" width="150">
+        <img src="{{ asset('images/logo/logo_veterinaria.png') }}" alt="Logo de Veterinaria Patitas" class="logo"
+            id="logo" width="150">
     </div>
 
     <script>
@@ -85,4 +96,5 @@
         }, 5000);
     </script>
 </body>
+
 </html>

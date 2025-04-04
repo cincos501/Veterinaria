@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'email', 'password', 'role']; // Cambiado 'rol' a 'role'
 
     public function cliente()
     {
@@ -22,7 +22,6 @@ class User extends Authenticatable
         parent::boot();
 
         static::created(function ($user) {
-            // Crear un registro en Cliente cuando se crea un usuario
             Cliente::create([
                 'user_id' => $user->id,
                 'telefono' => 'No registrado',
@@ -32,3 +31,4 @@ class User extends Authenticatable
     }
     
 }
+

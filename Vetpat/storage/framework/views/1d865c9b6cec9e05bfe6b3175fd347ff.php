@@ -4,7 +4,6 @@
     <div class="container mt-4">
         <h1 class="mb-4 text-center">Lista de Productos</h1>
 
-        <!-- Filtro por categoría -->
         <form method="GET" action="<?php echo e(route('admin.productos.index')); ?>" class="mb-3">
             <div class="row">
                 <div class="col-md-4">
@@ -16,6 +15,14 @@
 
                             </option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="promocion" class="form-control" onchange="this.form.submit()">
+                        <option value="">Promociones y No promociones</option>
+                        <option value="1" <?php echo e(request('promocion') == '1' ? 'selected' : ''); ?>>Solo en promoción
+                        </option>
+                        <option value="0" <?php echo e(request('promocion') == '0' ? 'selected' : ''); ?>>No en promoción</option>
                     </select>
                 </div>
             </div>
@@ -59,11 +66,16 @@
                             <td><?php echo e($producto->stock); ?></td>
                             <td><?php echo e($producto->categoria); ?></td>
                             <td>
-                                <?php if($producto->en_promocion): ?>
-                                    <span class="badge bg-success">Sí</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">No</span>
-                                <?php endif; ?>
+                                <form action="<?php echo e(route('admin.productos.togglePromocion', $producto->id)); ?>" method="POST"
+                                    style="display:inline;">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('PUT'); ?>
+                                    <button type="submit"
+                                        class="btn btn-sm <?php echo e($producto->promocion ? 'btn-success' : 'btn-secondary'); ?>">
+                                        <?php echo e($producto->promocion ? 'Sí' : 'No'); ?>
+
+                                    </button>
+                                </form>
                             </td>
                             <td>
                                 <a href="<?php echo e(route('admin.productos.edit', $producto->id)); ?>"

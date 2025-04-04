@@ -23,6 +23,13 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h5 class="card-title">Detalles de mi Perfil</h5>
+
+                        <!-- Imagen de perfil -->
+                        <div class="text-center mb-4">
+                            <img src="<?php echo e(asset('images/logo/perfil.jpg')); ?>" alt="Imagen de Perfil" class="rounded-circle"
+                                style="width: 150px; height: 150px;">
+                        </div>
+
                         <p><strong>Nombre:</strong> <?php echo e(Auth::user()->name); ?></p>
                         <p><strong>Email:</strong> <?php echo e(Auth::user()->email); ?></p>
                         <p><strong>Teléfono:</strong> <?php echo e($cliente->telefono); ?></p>

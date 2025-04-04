@@ -9,7 +9,7 @@ class Producto extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'categoria'];
+    protected $fillable = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'categoria', 'promocion'];
 
     // Método para obtener un nombre más amigable de la categoría
     public function getCategoriaNombreAttribute()
@@ -22,7 +22,24 @@ class Producto extends Model
             'juguetes' => 'Juguetes'
         ];
 
+        
+
         return $categorias[$this->categoria] ?? 'Otro';
     }
+    public function compras()
+{
+    return $this->belongsToMany(Compra::class, 'compra_producto')
+                ->withPivot('cantidad', 'precio')
+                ->withTimestamps();
 }
+
+    // Método para verificar si el stock es bajo
+    public function esStockBajo($umbral = 5)
+    {
+        return $this->stock <= $umbral;
+    }
+}
+
+
+
 

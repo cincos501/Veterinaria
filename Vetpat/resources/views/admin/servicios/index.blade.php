@@ -2,26 +2,28 @@
 
 @section('content')
     <div class="container mt-4">
-        <h2 class="mb-4 text-center">Gestión de Servicios</h2>
-        <a href="{{ route('admin.servicios.create') }}" class="btn btn-primary mb-3">Agregar Servicio</a>
+        <h1 class="mb-4 text-center">Lista de Servicios</h1>
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <form method="GET" action="{{ route('admin.servicios.index') }}" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o descripción"
+                        value="{{ request('search') }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
             </div>
-        @endif
+        </form>
 
-        <!-- Filtro de búsqueda -->
-        <div class="mb-3">
-            <form action="{{ route('admin.servicios.index') }}" method="GET">
-                <input type="text" class="form-control" name="search" placeholder="Buscar servicio..."
-                    value="{{ request('search') }}">
-            </form>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ route('admin.servicios.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar Servicio
+            </a>
         </div>
 
-        <!-- Tabla de Servicios -->
-        <div class="table-responsive shadow-sm rounded">
+        <!-- Tabla de servicios -->
+        <div class="table-responsive">
             <table class="table table-striped table-hover table-bordered">
                 <thead class="table-dark">
                     <tr>
@@ -30,6 +32,7 @@
                         <th>Descripción</th>
                         <th>Precio</th>
                         <th>Requisitos</th>
+                        <th>En Promoción</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -39,52 +42,35 @@
                             <td>
                                 @if ($servicio->imagen)
                                     <img src="{{ asset('storage/images/' . $servicio->imagen) }}"
-                                        alt="Imagen del servicio: {{ $servicio->nombre }}" class="img-fluid"
-                                        style="max-width: 100px;">
+                                        alt="{{ $servicio->nombre }}" width="50">
                                 @else
-                                    No disponible
+                                    <span>Sin imagen</span>
                                 @endif
                             </td>
                             <td>{{ $servicio->nombre }}</td>
-                            <td>{{ Str::limit($servicio->descripcion, 50) }}</td>
+                            <td>{{ $servicio->descripcion }}</td>
                             <td>Bs {{ number_format($servicio->precio, 2) }}</td>
-                            <td>{{ $servicio->requisitos ?? 'No disponible' }}</td>
+                            <td>{{ $servicio->requisitos ?? 'No tiene' }}</td>
+                            <td>
+                                <form action="{{ route('admin.servicios.togglePromocion', $servicio->id) }}" method="POST"
+                                    style="display:inline;">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit"
+                                        class="btn btn-sm {{ $servicio->promocion ? 'btn-success' : 'btn-secondary' }}">
+                                        {{ $servicio->promocion ? 'Sí' : 'No' }}
+                                    </button>
+                                </form>
+                            </td>
                             <td>
                                 <a href="{{ route('admin.servicios.edit', $servicio->id) }}"
-                                    class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <!-- Modal de Confirmación para Eliminar -->
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ $servicio->id }}"
-                                    class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                </a>
-
-                                <!-- Modal -->
-                                <div class="modal fade" id="confirmDelete{{ $servicio->id }}" tabindex="-1"
-                                    aria-labelledby="confirmDeleteLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="confirmDeleteLabel">Confirmar eliminación</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ¿Estás seguro de eliminar este servicio?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Cancelar</button>
-                                                <form action="{{ route('admin.servicios.destroy', $servicio->id) }}"
-                                                    method="POST">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    class="btn btn-sm btn-warning">Editar</a>
+                                <form action="{{ route('admin.servicios.destroy', $servicio->id) }}" method="POST"
+                                    style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
@@ -92,9 +78,6 @@
             </table>
         </div>
 
-        <!-- Paginación -->
-        <div class="d-flex justify-content-center mt-3">
-            {{ $servicios->links() }}
-        </div>
+        {{ $servicios->links() }} <!-- Paginación -->
     </div>
 @endsection

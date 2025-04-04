@@ -37,6 +37,12 @@
                             <h5 class="card-title"><?php echo e($producto->nombre); ?></h5>
                             <p class="card-text"><?php echo e(Str::limit($producto->descripcion, 100)); ?></p>
                             <p><strong>Bs <?php echo e(number_format($producto->precio, 2)); ?></strong></p>
+
+                            <!-- Mostrar promoción si existe -->
+                            <?php if($producto->promocion): ?>
+                                <p class="text-success font-weight-bold mt-2">¡En promoción! -20%</p>
+                            <?php endif; ?>
+
                             <a href="<?php echo e(route('cliente.productos.show', $producto->id)); ?>" class="btn btn-primary">Ver
                                 Detalles</a>
                         </div>
